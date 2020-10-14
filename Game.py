@@ -22,7 +22,7 @@ exp_x1 = 0
 exp_y1 = 0
 Ecrx = 1000
 Ecry = 700
-FPS = 20
+FPS = 60
 screen = pygame.display.set_mode((Ecrx, Ecry))
 okno_x_min=100
 okno_x_max=900
@@ -34,10 +34,13 @@ f1 = pygame.font.Font(None, 30)
 
 
 class Hero:
-    x = 0
-    y = 0
-    fi = 0
-    r=20
+    def __init__(self):
+        self.x = 200
+        self.y = 300
+        self.fi = 0
+        self.r=20
+        self.gun_x =int(self.x + 2*self.r * numpy.cos(self.fi))
+        self.gun_y =int(self.y + 2*self.r * numpy.sin(self.fi))
 
     def vverh(self):
         if self.y > okno_y_min + self.r:
@@ -57,6 +60,8 @@ class Hero:
             self.x += 100 / FPS
 
     def risyi(self, cursor):
+        self.gun_x = int(self.x + 2 * self.r * numpy.cos(self.fi))
+        self.gun_y = int(self.y + 2 * self.r * numpy.sin(self.fi))
         if self.y <= cursor[1]:
             self.fi = numpy.arccos((cursor[0] - self.x) / numpy.sqrt(
                 (cursor[0] - self.x) * (cursor[0] - self.x) + (cursor[1] - self.y) * (cursor[1] - self.y)))
@@ -65,11 +70,11 @@ class Hero:
                 (cursor[0] - self.x) * (cursor[0] - self.x) + (cursor[1] - self.y) * (cursor[1] - self.y)))
         circle(screen, [0, 0, 255], [int(self.x), int(self.y)], self.r)
         line(screen, [200, 200, 200], [int(self.x), int(self.y)],
-             [int(self.x + 2*self.r * numpy.cos(self.fi)), int(self.y + 2*self.r * numpy.sin(self.fi))], 3)
+             [self.gun_x, self.gun_y], 3)
 
     def vystrel(self):
-        line(screen, [255, 200, 100], [int(self.x), int(self.y)],
-             [int(self.x + 1000 * numpy.cos(self.fi)), int(self.y + 1000 * numpy.sin(self.fi))],5)
+        bullet = Bullets()
+        return bullet
 
 
 def explosion(x, y, t):
@@ -94,6 +99,7 @@ class SharOdin:
         self.speed_y = randint(-100, 100) / FPS
         self.time_of_birthday = time
 
+
     def dvizh(self):
         self.time_of_birthday = time
         if self.time_of_birthday - self.time_of_birthday < 200:
@@ -117,29 +123,48 @@ class SharOdin:
                 self.speed_x = randint(-100, 100) / FPS
 
     def risyi(self):
-        if self.time_of_birthday - self.time_of_birthday < 150:
+        if time - self.time_of_birthday < 150:
             circle(screen, [50 + (time - self.time_of_birthday) % 150, 0, 0],
                    [int(self.x), int(self.y)], self.r)
             circle(screen, [0, 0, 0], [int(self.x), int(self.y)],
                    self.r + 3, 3)
-        if (self.time_of_birthday - self.time_of_birthday > 150) and (
-                self.time_of_birthday - self.time_of_birthday < 201):
+        if (time - self.time_of_birthday > 150) and (
+                time - self.time_of_birthday < 201):
             circle(screen, [255, 255, 0], [int(self.x), int(self.y)],
                    self.r)
             circle(screen, [0, 0, 0], [int(self.x), int(self.y)],
                    self.r + 3, 3)
-        if self.time_of_birthday - self.time_of_birthday > 200:
+        if time - self.time_of_birthday > 200:
             explosion(int(self.x), int(self.y),
-                      self.time_of_birthday - self.time_of_birthday - 200)
+                      time - self.time_of_birthday - 200)
 
-    def check(self, hero, cursor):
-        if abs((cursor[1] - hero[1]) * self.x + (hero[0] - cursor[0]) * self.y - hero[0] * (
-                cursor[1] - hero[1]) + hero[1] * (cursor[0] - hero[0])) / numpy.sqrt(
-            (cursor[1] - hero[1]) * (cursor[1] - hero[1]) + (cursor[0] - hero[0]) * (cursor[0] - hero[0])) < self.r:
+    def check(self, x,y,r):
+        if ((self.x-x)**2+(self.y-y)**2<=(self.r+r)**2):
             return 1
         else:
             return 0
 
+class Bullets:
+    def __init__(self):
+        self.x=player.gun_x
+        self.y=player.gun_y
+        self.r=5
+        self.speed=300/FPS
+        self.fi=player.fi
+        self.live=True
+        self.color=(255,0,0)
+
+    def dvizh(self):
+        if self.x>okno_x_min and self.x<okno_x_max and self.live:
+            if self.y > okno_y_min and self.y < okno_y_max:
+                self.y += self.speed * numpy.sin(self.fi)
+            else:
+                self.live = False
+            self.x += self.speed * numpy.cos(self.fi)
+        else:
+            self.live=False
+    def risyi(self):
+        circle(screen,self.color,(int(self.x),int(self.y)),self.r)
 
 
 
@@ -152,14 +177,18 @@ shar_3 = SharOdin()
 shar_4 = SharOdin()
 shar_5 = SharOdin()
 player = Hero()
-
+bullet=Bullets()
+bullet.x=0
+bullet.y=0
 while not finished:
     clock.tick(FPS)
     screen.fill([0, 0, 0])
-    polygon(screen, [255, 255, 255], [[okno_x_min,okno_y_min], [okno_x_min,okno_y_max], [okno_x_max, okno_y_max],
-                                      [okno_x_max, okno_y_min]], 5)
+    polygon(screen, [255, 255, 255], [[okno_x_min-5,okno_y_min-5], [okno_x_min-5,okno_y_max+5], [okno_x_max+5, okno_y_max+5],
+                                      [okno_x_max+5, okno_y_min-5]], 5)
     time += 1
     screen.blit(f1.render('score = ' + str(score), 1, (255, 255, 255)), (0, 0))
+    bullet.dvizh()
+    bullet.risyi()
     shar_1.dvizh()
     shar_1.risyi()
     keys = pygame.key.get_pressed()
@@ -172,6 +201,9 @@ while not finished:
         player.vniz()
     if keys[pygame.K_d]:
         player.vpravo()
+    if shar_1.check(bullet.x, bullet.y, bullet.r):
+        score += 1
+        shar_1 = SharOdin()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             finished = True
@@ -180,10 +212,7 @@ while not finished:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if (event.button == 1) or (event.button == 3):
                 cursor_posM = event.pos
-                player.vystrel()
-                if shar_1.check([player.x, player.y], cursor_posM):
-                    score += 1
-                    shar_1 = SharOdin()
+                bullet=player.vystrel()
     player.risyi(cursor_posM)
     pygame.display.update()
 pygame.quit()
