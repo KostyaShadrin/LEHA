@@ -144,7 +144,7 @@ def explosion(x, y, t):
             circle(screen, [255, 255, 255],
                    [int(x + 0.15 * t * numpy.cos(fi) + dobavka_x),
                         int(y + 0.15 * t * numpy.sin(fi) + dobavka_y)], 10)
-#            if x + 0.15 * t * numpy.cos(fi) + dobavka_x
+
 
 
 
@@ -192,6 +192,11 @@ class SharOdin:
             if pygame.time.get_ticks() - self.time_of_birthday > T_live_sharov and self.live:
                 self.live = False
         else:
+            for dot in player.hitbox():
+                if (dot[0] - self.x) ** 2 + (dot[1]-self.y) ** 2 < (0.15 * (pygame.time.get_ticks()-self.time_of_birthday-T_live_sharov)) ** 2:
+                    global score
+                    score -= 10
+                    self.__init__()
             if pygame.time.get_ticks() - self.time_of_birthday < T_live_sharov * 1.5:
                 explosion(int(self.x), int(self.y),
                           pygame.time.get_ticks() - self.time_of_birthday - T_live_sharov)
@@ -277,6 +282,8 @@ while not finished:
             finished = True
         if event.type == pygame.MOUSEMOTION:
             cursor_pos = event.pos
+            if inside_check(cursor_pos[0],cursor_pos[1],player.hitbox()):
+                score+=1
         if event.type == pygame.MOUSEBUTTONDOWN:
             if (event.button == 1) or (event.button == 3):
                 cursor_pos = event.pos
