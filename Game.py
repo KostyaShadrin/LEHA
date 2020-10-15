@@ -100,26 +100,29 @@ class Hero:
         circle(screen, [255, 255, 150], [int(self.x), int(self.y)], int(0.2 * self.r))
         polygon(screen, WHITE, [self.new_coord(0.325, 0.25), self.new_coord(0.525, 0.15), self.new_coord(0.675, 0.45),
                                 self.new_coord(0.475, 0.55)])
-        lines(screen, BLACK, False,
-              [self.new_coord(0.6, 0.3), self.new_coord(0.625, 0.45), self.new_coord(0.525, 0.2),
-               self.new_coord(0.585, 0.47),
-               self.new_coord(0.485, 0.22), self.new_coord(0.545, 0.49), self.new_coord(0.445, 0.24),
-               self.new_coord(0.505, 0.51), self.new_coord(0.405, 0.26), self.new_coord(0.465, 0.53),
-               self.new_coord(0.365, 0.28), self.new_coord(0.4, 0.4), self.new_coord(0.6, 0.3)],
-              1)
-        line(screen, BLACK, self.new_coord(0.6, 0.3), self.new_coord(0.4, 0.4), 2)
-        line(screen, BLACK, self.new_coord(0.675, 0.45), self.new_coord(0.475, 0.55), 2)
-        line(screen, BLACK, self.new_coord(0.525, 0.15), self.new_coord(0.325, 0.25), 2)
-        circle(screen, BLACK, self.new_coord(0.45, -0.3), self.r // 50)
-
     def vystrel(self):
         for i in range(len(Magazin) - 1):
             Magazin[i] = Magazin[i + 1]
         Magazin[5] = Bullets()
-def inside_check(x,y,A):
-    for a in A:
-        if True:
-            pass
+def inside_check(x, y, A):
+    det_prev = 0
+    for i in range(len(A)):
+        a_x = A[i][0]
+        a_y = A[i][1]
+        b_x = A[(i + 1)%len(A)][0]
+        b_y = A[(i + 1)%len(A)][1]
+        # counting vector between the first neighbouring vertex and click position
+        ev_point_x = x - a_x
+        ev_point_y = y - a_y
+        v_x = b_x - a_x
+        v_y = b_y - a_y
+        # counting the determinant(oriented area)
+        det = - ev_point_x * v_y + ev_point_y * v_x
+        # Ориентация поменялась?
+        if det * det_prev < 0:
+            return False
+        det_prev = - ev_point_x * v_y + ev_point_y * v_x
+    return True
 
 def explosion(x, y, t):
     if t < 0.5 * T_live_sharov:
