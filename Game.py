@@ -43,16 +43,13 @@ f1 = pygame.font.Font(None, 30)
 
 
 class Hero:
-    def __init__(self):
-        self.x = 200
-        self.y = 300
-        self.fi = 0
-        self.r = 80
-        self.tsvet_tela = 0
-        self.tsvet_planseta = 3
-        self.gun_x = int(self.x + 2 * self.r * numpy.cos(self.fi))
-        self.gun_y = int(self.y + 2 * self.r * numpy.sin(self.fi))
-        self.Hitbox = [[0, 0]] * 6
+    x = 200
+    y = 300
+    fi = 0
+    r = 80
+    tsvet_tela = 0
+    tsvet_planseta = 3
+    Hitbox = [[0, 0]] * 6
 
     def vverh(self):
         if self.y > okno_y_min + self.r // 2:
@@ -80,7 +77,7 @@ class Hero:
 
     def ugol(self, cursor):
         if self.y <= cursor[1]:
-            self.fi = numpy.arccos((cursor[0] - self.x) / (1+numpy.sqrt(
+            self.fi = numpy.arccos((cursor[0] - self.x) / (1 + numpy.sqrt(
                 (cursor[0] - self.x) * (cursor[0] - self.x) + (cursor[1] - self.y) * (cursor[1] - self.y))))
         if self.y > cursor[1]:
             self.fi = numpy.pi + numpy.arccos(-(cursor[0] - self.x) / numpy.sqrt(
@@ -125,29 +122,21 @@ class Hero:
 
 
 class AntiHero(Hero):
-    def __init__(self):
-        super().__init__()
-        self.x = 600
-        self.y = 300
-        self.fi = 0
-        self.r = 80
-        self.tsvet_tela = 9
-        self.tsvet_planseta = 0
-        self.gun_x = int(self.x + 2 * self.r * numpy.cos(self.fi))
-        self.gun_y = int(self.y + 2 * self.r * numpy.sin(self.fi))
-        self.Hitbox = [[0, 0]] * 6
-        self.time_of_birthday = pygame.time.get_ticks()
-        self.live = True
-
-    def butylka(self, x, y, r):
-        polygon(screen, COLORS[7], [super().new_coord()])
+    x = 600
+    y = 300
+    fi = 0
+    r = 80
+    tsvet_tela = 9
+    tsvet_planseta = 0
+    Hitbox = [[0, 0]] * 6
+    time_of_birthday = pygame.time.get_ticks()
+    live = True
 
     def ugol_epta(self, hero):
         super().ugol(hero)
 
     def risyi_epta(self):
         super().risyi()
-
 
     def shagi(self):
         if self.time_of_birthday - self.time_of_birthday < 20000 and self.live:
@@ -165,6 +154,24 @@ class AntiHero(Hero):
             if self.y > okno_y_max - self.r:
                 self.speed_y = -self.speed_y
                 self.y = self.y + 2 * int(round(self.speed_y))
+
+
+class Snaryad(AntiHero):
+    def __init__(self):
+        self.x = super().x
+        self.y = super().y
+        self.fi = super().fi
+        self.r = 20
+        self.Hitbox = [[0, 0]] * 4
+        self.time_of_birthday = pygame.time.get_ticks()
+        self.live = True
+
+    def butylka(self):
+        polygon(screen, COLORS[7],
+                [super().new_coord(0.05, 0.5), super().new_coord(0.05, 0.3), super().new_coord(0.15, 0.2),
+                 super().new_coord(0.15, -0.5),
+                 super().new_coord(-0.15, -0.5), super().new_coord(-0.15, 0.2), super().new_coord(-0.05, 0.3),
+                 super().new_coord(-0.05, 0.5)])
 
 
 def inside_check(x, y, a):
@@ -244,7 +251,8 @@ class SharOdin:
                 self.live = False
         else:
             for dot in player.hitbox():
-                if (dot[0] - self.x) ** 2 + (dot[1]-self.y) ** 2 < (0.15 * (pygame.time.get_ticks()-self.time_of_birthday-T_live_sharov)) ** 2 and not self.live:
+                if (dot[0] - self.x) ** 2 + (dot[1] - self.y) ** 2 < (0.15 * (
+                        pygame.time.get_ticks() - self.time_of_birthday - T_live_sharov)) ** 2 and not self.live:
                     global score
                     score -= 10
                     self.__init__()
