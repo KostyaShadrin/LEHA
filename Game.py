@@ -70,20 +70,20 @@ class Hero:
             self.x += Vchelika
 
     def new_coord(self, dx, dy):
-        return (self.x + dx * self.r * numpy.cos(self.fi) + dy * self.r * numpy.sin(self.fi),
-                self.y + dx * self.r * numpy.sin(self.fi) - dy * self.r * numpy.cos(self.fi))
+        return (int(self.x + dx * self.r * numpy.cos(self.fi) + dy * self.r * numpy.sin(self.fi)),
+                int(self.y + dx * self.r * numpy.sin(self.fi) - dy * self.r * numpy.cos(self.fi)))
 
     def hitbox(self):
         return [self.new_coord(0.3, 0), self.new_coord(0.3, 0.5), self.new_coord(-0.2, 0.5),
-                       self.new_coord(-0.2, 0), self.new_coord(-0.2, -0.5), self.new_coord(0.3, -0.5)]
+                self.new_coord(-0.2, 0), self.new_coord(-0.2, -0.5), self.new_coord(0.3, -0.5)]
 
     def risyi(self, cursor):
         if self.y <= cursor[1]:
-            self.fi = numpy.arccos((cursor[0] - self.x) / numpy.sqrt(
-                (cursor[0] - self.x) * (cursor[0] - self.x) + (cursor[1] - self.y) * (cursor[1] - self.y)))
+            self.fi = numpy.arccos((cursor[0] - self.x) / (1 + numpy.sqrt(
+                (cursor[0] - self.x) * (cursor[0] - self.x) + (cursor[1] - self.y) * (cursor[1] - self.y))))
         if self.y > cursor[1]:
-            self.fi = numpy.pi + numpy.arccos(-(cursor[0] - self.x) / numpy.sqrt(
-                (cursor[0] - self.x) * (cursor[0] - self.x) + (cursor[1] - self.y) * (cursor[1] - self.y)))
+            self.fi = numpy.pi + numpy.arccos(-(cursor[0] - self.x) / (1 + numpy.sqrt(
+                (cursor[0] - self.x) * (cursor[0] - self.x) + (cursor[1] - self.y) * (cursor[1] - self.y))))
         polygon(screen, [255, 255, 150], [self.new_coord(0.3, 0.5), self.new_coord(0.5, 0.4), self.new_coord(0.4, 0.3)])
         polygon(screen, [255, 255, 150],
                 [self.new_coord(0.3, -0.5), self.new_coord(0.5, -0.4), self.new_coord(0.4, -0.3)])
@@ -100,14 +100,34 @@ class Hero:
         circle(screen, [255, 255, 150], [int(self.x), int(self.y)], int(0.2 * self.r))
         polygon(screen, WHITE, [self.new_coord(0.325, 0.25), self.new_coord(0.525, 0.15), self.new_coord(0.675, 0.45),
                                 self.new_coord(0.475, 0.55)])
+
     def vystrel(self):
         for i in range(len(Magazin) - 1):
             Magazin[i] = Magazin[i + 1]
         Magazin[5] = Bullets()
-def inside_check(x,y,A):
-    for a in A:
-        if True:
-            pass
+
+
+# Проверка, находится ли точка х  в полигоне(ВЫПУКЛОМ!!!!!) А
+def inside_check(x, y, A):
+    det_prev = 0
+    for i in range(len(A)):
+        a_x = A[i][0]
+        a_y = A[i][1]
+        b_x = A[(i + 1)%len(A)][0]
+        b_y = A[(i + 1)%len(A)][1]
+        # counting vector between the first neighbouring vertex and click position
+        ev_point_x = x - a_x
+        ev_point_y = y - a_y
+        v_x = b_x - a_x
+        v_y = b_y - a_y
+        # counting the determinant(oriented area)
+        det = - ev_point_x * v_y + ev_point_y * v_x
+        # Ориентация поменялась?
+        if det * det_prev < 0:
+            return False
+        det_prev = - ev_point_x * v_y + ev_point_y * v_x
+    return True
+
 
 def explosion(x, y, t):
     if t < 0.5 * T_live_sharov:
@@ -117,9 +137,10 @@ def explosion(x, y, t):
             dobavka_y = randint(-10, 10)
             circle(screen, [255, 255, 255],
                    [int(x + 0.15 * t * numpy.cos(fi) + dobavka_x),
-                        int(y + 0.15 * t * numpy.sin(fi) + dobavka_y)], 10)
-#            if x + 0.15 * t * numpy.cos(fi) + dobavka_x
+                    int(y + 0.15 * t * numpy.sin(fi) + dobavka_y)], 10)
 
+
+#            if x + 0.15 * t * numpy.cos(fi) + dobavka_x
 
 
 class SharOdin:
@@ -247,6 +268,9 @@ while not finished:
                 score += 1
                 Protivniki[i] = SharOdin()
     for event in pygame.event.get():
+        if inside_check(cursor_pos[0], cursor_pos[1], [[okno_x_min - 5, okno_y_min - 5], [okno_x_min - 5, okno_y_max + 5], [okno_x_max + 5, okno_y_max + 5],
+             [okno_x_max + 5, okno_y_min - 5]]):
+            score += 1
         if event.type == pygame.QUIT:
             finished = True
         if event.type == pygame.MOUSEMOTION:
