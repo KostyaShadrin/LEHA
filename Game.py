@@ -46,7 +46,7 @@ class Hero:
         self.x = 200
         self.y = 300
         self.fi = 0
-        self.r = 50
+        self.r = 80
         self.tsvet_tela = COLORS[0]
         self.tsvet_planseta = COLORS[3]
         self.gun_x = int(self.x + 2 * self.r * numpy.cos(self.fi))
@@ -54,19 +54,19 @@ class Hero:
         self.Hitbox = [[0, 0]] * 6
 
     def vverh(self):
-        if self.y > okno_y_min + self.r:
+        if self.y > okno_y_min + self.r // 2:
             self.y -= Vchelika
 
     def vniz(self):
-        if self.y < okno_y_max - self.r:
+        if self.y < okno_y_max - self.r // 2:
             self.y += Vchelika
 
     def vlevo(self):
-        if self.x > okno_x_min + self.r:
+        if self.x > okno_x_min + self.r // 2:
             self.x -= Vchelika
 
     def vpravo(self):
-        if self.x < okno_x_max - self.r:
+        if self.x < okno_x_max - self.r // 2:
             self.x += Vchelika
 
     def new_coord(self, dx, dy):
@@ -230,7 +230,7 @@ class Bullets:
 
 
 def draw_scren():
-    screen.fill([0, 0, 0])
+    screen.fill([200, 200, 200])
     player.risyi(cursor_pos)
     for bullet in Magazin:
         bullet.risyi()
