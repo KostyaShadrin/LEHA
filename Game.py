@@ -97,7 +97,10 @@ class Hero:
         for i in range(len(Magazin) - 1):
             Magazin[i] = Magazin[i + 1]
         Magazin[5] = Bullets()
-
+def inside_check(x,y,A):
+    for a in A:
+        if True:
+            pass
 
 def explosion(x, y, t):
     if t < 0.5*T_live_sharov:
@@ -106,7 +109,10 @@ def explosion(x, y, t):
             dobavka_x = randint(-10, 10)
             dobavka_y = randint(-10, 10)
             circle(screen, [255, 255, 255],
-                   [int(x + 0.15 * t * numpy.cos(fi) + dobavka_x), int(y + 0.15 * t * numpy.sin(fi) + dobavka_y)], 10)
+                   [int(x + 0.15 * t * numpy.cos(fi) + dobavka_x),
+                        int(y + 0.15 * t * numpy.sin(fi) + dobavka_y)], 10)
+#            if x + 0.15 * t * numpy.cos(fi) + dobavka_x
+
 
 
 class SharOdin:
