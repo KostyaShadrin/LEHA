@@ -32,7 +32,7 @@ okno_x_min = 100
 okno_x_max = 900
 okno_y_min = 100
 okno_y_max = 600
-Vsharikov = 4 * 60 / FPS
+Vsharikov = int(4 * 60 / FPS)
 Vchelika = 3 * 60 / FPS
 Vpuli = 7 * 60 / FPS
 T_live_sharov = 5000
@@ -46,7 +46,7 @@ class Hero:
         self.x = 200
         self.y = 300
         self.fi = 0
-        self.r = 50
+        self.r = 80
         self.tsvet_tela = COLORS[0]
         self.tsvet_planseta = COLORS[3]
         self.gun_x = int(self.x + 2 * self.r * numpy.cos(self.fi))
@@ -54,19 +54,19 @@ class Hero:
         self.Hitbox = [[0, 0]] * 6
 
     def vverh(self):
-        if self.y > okno_y_min + self.r:
+        if self.y > okno_y_min + self.r // 2:
             self.y -= Vchelika
 
     def vniz(self):
-        if self.y < okno_y_max - self.r:
+        if self.y < okno_y_max - self.r // 2:
             self.y += Vchelika
 
     def vlevo(self):
-        if self.x > okno_x_min + self.r:
+        if self.x > okno_x_min + self.r // 2:
             self.x -= Vchelika
 
     def vpravo(self):
-        if self.x < okno_x_max - self.r:
+        if self.x < okno_x_max - self.r // 2:
             self.x += Vchelika
 
     def new_coord(self, dx, dy):
@@ -75,7 +75,7 @@ class Hero:
 
     def hitbox(self):
         return [self.new_coord(0.3, 0), self.new_coord(0.3, 0.5), self.new_coord(-0.2, 0.5),
-                       self.new_coord(-0.2, 0), self.new_coord(-0.2, -0.5), self.new_coord(0.3, -0.5)]
+                self.new_coord(-0.2, 0), self.new_coord(-0.2, -0.5), self.new_coord(0.3, -0.5)]
 
     def risyi(self, cursor):
         if self.y <= cursor[1]:
@@ -111,17 +111,20 @@ class Hero:
         line(screen, BLACK, self.new_coord(0.675, 0.45), self.new_coord(0.475, 0.55), 2)
         line(screen, BLACK, self.new_coord(0.525, 0.15), self.new_coord(0.325, 0.25), 2)
         circle(screen, BLACK, self.new_coord(0.45, -0.3), self.r // 50)
+
     def vystrel(self):
-        for i in range(len(Magazin) - 1):
-            Magazin[i] = Magazin[i + 1]
+        for it in range(len(Magazin) - 1):
+            Magazin[it] = Magazin[it + 1]
         Magazin[5] = Bullets()
-def inside_check(x, y, A):
+
+
+def inside_check(x, y, a):
     det_prev = 0
-    for i in range(len(A)):
-        a_x = A[i][0]
-        a_y = A[i][1]
-        b_x = A[(i + 1)%len(A)][0]
-        b_y = A[(i + 1)%len(A)][1]
+    for iba in range(len(a)):
+        a_x = a[iba][0]
+        a_y = a[iba][1]
+        b_x = a[(iba + 1) % len(a)][0]
+        b_y = a[(iba + 1) % len(a)][1]
         # counting vector between the first neighbouring vertex and click position
         ev_point_x = x - a_x
         ev_point_y = y - a_y
@@ -135,16 +138,16 @@ def inside_check(x, y, A):
         det_prev = - ev_point_x * v_y + ev_point_y * v_x
     return True
 
+
 def explosion(x, y, t):
     if t < 0.5 * T_live_sharov:
-        for i in range(0, 30):
+        for ik in range(0, 30):
             fi = randint(0, 500)
             dobavka_x = randint(-10, 10)
             dobavka_y = randint(-10, 10)
             circle(screen, [255, 255, 255],
                    [int(x + 0.15 * t * numpy.cos(fi) + dobavka_x),
                         int(y + 0.15 * t * numpy.sin(fi) + dobavka_y)], 10)
-
 
 
 
@@ -235,12 +238,12 @@ class Bullets:
 
 
 def draw_scren():
-    screen.fill([0, 0, 0])
+    screen.fill([200, 200, 200])
     player.risyi(cursor_pos)
-    for bullet in Magazin:
-        bullet.risyi()
-    for shar in Protivniki:
-        shar.risyi()
+    for bullet_d in Magazin:
+        bullet_d.risyi()
+    for shar_n in Protivniki:
+        shar_n.risyi()
     screen.blit(f1.render('score = ' + str(score), 1, (255, 255, 255)), (0, 0))
     polygon(screen, [255, 255, 255],
             [[okno_x_min - 5, okno_y_min - 5], [okno_x_min - 5, okno_y_max + 5], [okno_x_max + 5, okno_y_max + 5],
@@ -282,12 +285,10 @@ while not finished:
             finished = True
         if event.type == pygame.MOUSEMOTION:
             cursor_pos = event.pos
-            if inside_check(cursor_pos[0],cursor_pos[1],player.hitbox()):
-                score+=1
         if event.type == pygame.MOUSEBUTTONDOWN:
             if (event.button == 1) or (event.button == 3):
                 cursor_pos = event.pos
-                bullet = player.vystrel()
+                player.vystrel()
     if pygame.time.get_ticks() - time_prev_update > 500 / FPS:
         if keys[pygame.K_w]:
             player.vverh()
