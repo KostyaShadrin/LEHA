@@ -46,7 +46,7 @@ class Hero:
         self.x = 200
         self.y = 300
         self.fi = 0
-        self.r = 50
+        self.r = 80
         self.tsvet_tela = COLORS[0]
         self.tsvet_planseta = COLORS[3]
         self.gun_x = int(self.x + 2 * self.r * numpy.cos(self.fi))
@@ -54,28 +54,28 @@ class Hero:
         self.Hitbox = [[0, 0]] * 6
 
     def vverh(self):
-        if self.y > okno_y_min + self.r:
+        if self.y > okno_y_min + self.r // 2:
             self.y -= Vchelika
 
     def vniz(self):
-        if self.y < okno_y_max - self.r:
+        if self.y < okno_y_max - self.r // 2:
             self.y += Vchelika
 
     def vlevo(self):
-        if self.x > okno_x_min + self.r:
+        if self.x > okno_x_min + self.r // 2:
             self.x -= Vchelika
 
     def vpravo(self):
-        if self.x < okno_x_max - self.r:
+        if self.x < okno_x_max - self.r // 2:
             self.x += Vchelika
 
     def new_coord(self, dx, dy):
-        return (self.x + dx * self.r * numpy.cos(self.fi) + dy * self.r * numpy.sin(self.fi),
-                self.y + dx * self.r * numpy.sin(self.fi) - dy * self.r * numpy.cos(self.fi))
+        return (int(self.x + dx * self.r * numpy.cos(self.fi) + dy * self.r * numpy.sin(self.fi)),
+                int(self.y + dx * self.r * numpy.sin(self.fi) - dy * self.r * numpy.cos(self.fi)))
 
     def hitbox(self):
         return [self.new_coord(0.3, 0), self.new_coord(0.3, 0.5), self.new_coord(-0.2, 0.5),
-                       self.new_coord(-0.2, 0), self.new_coord(-0.2, -0.5), self.new_coord(0.3, -0.5)]
+                self.new_coord(-0.2, 0), self.new_coord(-0.2, -0.5), self.new_coord(0.3, -0.5)]
 
     def risyi(self, cursor):
         if self.y <= cursor[1]:
@@ -100,6 +100,18 @@ class Hero:
         circle(screen, [255, 255, 150], [int(self.x), int(self.y)], int(0.2 * self.r))
         polygon(screen, WHITE, [self.new_coord(0.325, 0.25), self.new_coord(0.525, 0.15), self.new_coord(0.675, 0.45),
                                 self.new_coord(0.475, 0.55)])
+        lines(screen, BLACK, False,
+              [self.new_coord(0.6, 0.3), self.new_coord(0.625, 0.45), self.new_coord(0.525, 0.2),
+               self.new_coord(0.585, 0.47),
+               self.new_coord(0.485, 0.22), self.new_coord(0.545, 0.49), self.new_coord(0.445, 0.24),
+               self.new_coord(0.505, 0.51), self.new_coord(0.405, 0.26), self.new_coord(0.465, 0.53),
+               self.new_coord(0.365, 0.28), self.new_coord(0.4, 0.4), self.new_coord(0.6, 0.3)],
+              1)
+        line(screen, BLACK, self.new_coord(0.6, 0.3), self.new_coord(0.4, 0.4), 2)
+        line(screen, BLACK, self.new_coord(0.675, 0.45), self.new_coord(0.475, 0.55), 2)
+        line(screen, BLACK, self.new_coord(0.525, 0.15), self.new_coord(0.325, 0.25), 2)
+        circle(screen, BLACK, self.new_coord(0.45, -0.3), self.r // 50)
+
     def vystrel(self):
         for i in range(len(Magazin) - 1):
             Magazin[i] = Magazin[i + 1]
@@ -204,7 +216,7 @@ class Bullets:
 
 
 def draw_scren():
-    screen.fill([0, 0, 0])
+    screen.fill([200, 200, 200])
     player.risyi(cursor_pos)
     for bullet in Magazin:
         bullet.risyi()
