@@ -80,8 +80,8 @@ class Hero:
 
     def ugol(self, cursor):
         if self.y <= cursor[1]:
-            self.fi = numpy.arccos((cursor[0] - self.x) / numpy.sqrt(
-                (cursor[0] - self.x) * (cursor[0] - self.x) + (cursor[1] - self.y) * (cursor[1] - self.y)))
+            self.fi = numpy.arccos((cursor[0] - self.x) / (1+numpy.sqrt(
+                (cursor[0] - self.x) * (cursor[0] - self.x) + (cursor[1] - self.y) * (cursor[1] - self.y))))
         if self.y > cursor[1]:
             self.fi = numpy.pi + numpy.arccos(-(cursor[0] - self.x) / numpy.sqrt(
                 (cursor[0] - self.x) * (cursor[0] - self.x) + (cursor[1] - self.y) * (cursor[1] - self.y)))
@@ -113,10 +113,10 @@ class Hero:
                self.new_coord(0.505, 0.51), self.new_coord(0.405, 0.26), self.new_coord(0.465, 0.53),
                self.new_coord(0.365, 0.28), self.new_coord(0.4, 0.4), self.new_coord(0.6, 0.3)],
               1)
-        line(screen, COLORS[9], self.new_coord(0.6, 0.3), self.new_coord(0.4, 0.4), 2)
-        line(screen, COLORS[9], self.new_coord(0.675, 0.45), self.new_coord(0.475, 0.55), 2)
-        line(screen, COLORS[9], self.new_coord(0.525, 0.15), self.new_coord(0.325, 0.25), 2)
-        circle(screen, COLORS[9], self.new_coord(0.45, -0.3), self.r // 50)
+        line(screen, BLACK, self.new_coord(0.6, 0.3), self.new_coord(0.4, 0.4), 2)
+        line(screen, BLACK, self.new_coord(0.675, 0.45), self.new_coord(0.475, 0.55), 2)
+        line(screen, BLACK, self.new_coord(0.525, 0.15), self.new_coord(0.325, 0.25), 2)
+        circle(screen, BLACK, self.new_coord(0.45, -0.3), self.r // 50)
 
     def vystrel(self):
         for it in range(len(Magazin) - 1):
@@ -244,12 +244,11 @@ class SharOdin:
                 self.live = False
         else:
             for dot in player.hitbox():
-                if (dot[0] - self.x) ** 2 + (dot[1] - self.y) ** 2 < (
-                        0.15 * (pygame.time.get_ticks() - self.time_of_birthday - T_live_sharov)) ** 2:
+                if (dot[0] - self.x) ** 2 + (dot[1]-self.y) ** 2 < (0.15 * (pygame.time.get_ticks()-self.time_of_birthday-T_live_sharov)) ** 2 and not self.live:
                     global score
                     score -= 10
                     self.__init__()
-            if pygame.time.get_ticks() - self.time_of_birthday < T_live_sharov * 1.5:
+            if pygame.time.get_ticks() - self.time_of_birthday < T_live_sharov * 1.5 and not self.live:
                 explosion(int(self.x), int(self.y),
                           pygame.time.get_ticks() - self.time_of_birthday - T_live_sharov)
             else:
