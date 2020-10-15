@@ -23,15 +23,17 @@ exp_y1 = 0
 Ecrx = 1000
 Ecry = 700
 FPS = 60
+if FPS > 200:
+    FPS=200
 cursor_pos = [0, 0]
 screen = pygame.display.set_mode((Ecrx, Ecry))
 okno_x_min = 100
 okno_x_max = 900
 okno_y_min = 100
 okno_y_max = 600
-Vsharikov = 5
-Vchelika = 3
-Vpuli = 7
+Vsharikov = 4*60/FPS
+Vchelika = 3*60/FPS
+Vpuli = 7*60/FPS
 T_live_sharov=5000
 
 pygame.font.SysFont('arial', 36)
