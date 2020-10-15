@@ -13,7 +13,8 @@ MAGENTA = (255, 0, 255)
 CYAN = (0, 255, 255)
 BLACK = (0, 0, 0)
 LBLUE = (62, 195, 255)
-COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN, LBLUE]
+WHITE = (255, 255, 255)
+COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN, LBLUE, WHITE]
 
 score = 0
 exp_x = 0
@@ -24,17 +25,17 @@ Ecrx = 1000
 Ecry = 700
 FPS = 60
 if FPS > 200:
-    FPS=200
+    FPS = 200
 cursor_pos = [0, 0]
 screen = pygame.display.set_mode((Ecrx, Ecry))
 okno_x_min = 100
 okno_x_max = 900
 okno_y_min = 100
 okno_y_max = 600
-Vsharikov = 4*60/FPS
-Vchelika = 3*60/FPS
-Vpuli = 7*60/FPS
-T_live_sharov=5000
+Vsharikov = 4 * 60 / FPS
+Vchelika = 3 * 60 / FPS
+Vpuli = 7 * 60 / FPS
+T_live_sharov = 5000
 
 pygame.font.SysFont('arial', 36)
 f1 = pygame.font.Font(None, 30)
@@ -50,6 +51,7 @@ class Hero:
         self.tsvet_planseta = COLORS[3]
         self.gun_x = int(self.x + 2 * self.r * numpy.cos(self.fi))
         self.gun_y = int(self.y + 2 * self.r * numpy.sin(self.fi))
+        self.Hitbox = [[0, 0]] * 6
 
     def vverh(self):
         if self.y > okno_y_min + self.r:
@@ -68,8 +70,12 @@ class Hero:
             self.x += Vchelika
 
     def new_coord(self, dx, dy):
-        return [self.x + dx * self.r * numpy.cos(self.fi) + dy * self.r * numpy.sin(self.fi),
-                self.y + dx * self.r * numpy.sin(self.fi) - dy * self.r * numpy.cos(self.fi)]
+        return (self.x + dx * self.r * numpy.cos(self.fi) + dy * self.r * numpy.sin(self.fi),
+                self.y + dx * self.r * numpy.sin(self.fi) - dy * self.r * numpy.cos(self.fi))
+
+    def hitbox(self):
+        return [self.new_coord(0.3, 0), self.new_coord(0.3, 0.5), self.new_coord(-0.2, 0.5),
+                       self.new_coord(-0.2, 0), self.new_coord(-0.2, -0.5), self.new_coord(0.3, -0.5)]
 
     def risyi(self, cursor):
         if self.y <= cursor[1]:
@@ -92,7 +98,8 @@ class Hero:
                  self.new_coord(0.5, 0.1)])
         line(screen, self.tsvet_planseta, self.new_coord(0.45, -0.3), self.new_coord(0.45, -0.6), self.r // 20)
         circle(screen, [255, 255, 150], [int(self.x), int(self.y)], int(0.2 * self.r))
-
+        polygon(screen, WHITE, [self.new_coord(0.325, 0.25), self.new_coord(0.525, 0.15), self.new_coord(0.675, 0.45),
+                                self.new_coord(0.475, 0.55)])
     def vystrel(self):
         for i in range(len(Magazin) - 1):
             Magazin[i] = Magazin[i + 1]
@@ -103,7 +110,7 @@ def inside_check(x,y,A):
             pass
 
 def explosion(x, y, t):
-    if t < 0.5*T_live_sharov:
+    if t < 0.5 * T_live_sharov:
         for i in range(0, 30):
             fi = randint(0, 500)
             dobavka_x = randint(-10, 10)
@@ -144,12 +151,13 @@ class SharOdin:
 
     def risyi(self):
         if self.live:
-            if pygame.time.get_ticks() - self.time_of_birthday < 3*T_live_sharov/4:
-                circle(screen, [50 + ((pygame.time.get_ticks() - self.time_of_birthday) *200/T_live_sharov % 150), 0, 0],
+            if pygame.time.get_ticks() - self.time_of_birthday < 3 * T_live_sharov / 4:
+                circle(screen,
+                       [50 + ((pygame.time.get_ticks() - self.time_of_birthday) * 200 / T_live_sharov % 150), 0, 0],
                        [int(self.x), int(self.y)], self.r)
                 circle(screen, [0, 0, 0], [int(self.x), int(self.y)],
                        self.r + 3, 3)
-            if (pygame.time.get_ticks() - self.time_of_birthday > 3*T_live_sharov/4) and (
+            if (pygame.time.get_ticks() - self.time_of_birthday > 3 * T_live_sharov / 4) and (
                     pygame.time.get_ticks() - self.time_of_birthday < T_live_sharov):
                 circle(screen, [255, 255, 0], [int(self.x), int(self.y)],
                        self.r)
@@ -158,7 +166,7 @@ class SharOdin:
             if pygame.time.get_ticks() - self.time_of_birthday > T_live_sharov and self.live:
                 self.live = False
         else:
-            if pygame.time.get_ticks() - self.time_of_birthday < T_live_sharov*1.5:
+            if pygame.time.get_ticks() - self.time_of_birthday < T_live_sharov * 1.5:
                 explosion(int(self.x), int(self.y),
                           pygame.time.get_ticks() - self.time_of_birthday - T_live_sharov)
             else:
@@ -228,7 +236,6 @@ if True:
     bullet_5 = Bullets()
     bullet_6 = Bullets()
     Magazin = [bullet_0, bullet_1, bullet_2, bullet_4, bullet_5, bullet_6]
-
 
 draw_scren()
 time_prev_update = pygame.time.get_ticks()
