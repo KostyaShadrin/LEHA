@@ -196,11 +196,11 @@ class SharOdin:
                 self.live = False
         else:
             for dot in player.hitbox():
-                if (dot[0] - self.x) ** 2 + (dot[1]-self.y) ** 2 < (0.15 * (pygame.time.get_ticks()-self.time_of_birthday-T_live_sharov)) ** 2:
+                if (dot[0] - self.x) ** 2 + (dot[1]-self.y) ** 2 < (0.15 * (pygame.time.get_ticks()-self.time_of_birthday-T_live_sharov)) ** 2 and not self.live:
                     global score
                     score -= 10
                     self.__init__()
-            if pygame.time.get_ticks() - self.time_of_birthday < T_live_sharov * 1.5:
+            if pygame.time.get_ticks() - self.time_of_birthday < T_live_sharov * 1.5 and not self.live:
                 explosion(int(self.x), int(self.y),
                           pygame.time.get_ticks() - self.time_of_birthday - T_live_sharov)
             else:
