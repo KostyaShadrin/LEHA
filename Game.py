@@ -79,11 +79,11 @@ class Hero:
 
     def risyi(self, cursor):
         if self.y <= cursor[1]:
-            self.fi = numpy.arccos((cursor[0] - self.x) / numpy.sqrt(
-                (cursor[0] - self.x) * (cursor[0] - self.x) + (cursor[1] - self.y) * (cursor[1] - self.y)))
+            self.fi = numpy.arccos((cursor[0] - self.x) / (1+numpy.sqrt(
+                (cursor[0] - self.x) * (cursor[0] - self.x) + (cursor[1] - self.y) * (cursor[1] - self.y))))
         if self.y > cursor[1]:
-            self.fi = numpy.pi + numpy.arccos(-(cursor[0] - self.x) / numpy.sqrt(
-                (cursor[0] - self.x) * (cursor[0] - self.x) + (cursor[1] - self.y) * (cursor[1] - self.y)))
+            self.fi = numpy.pi + numpy.arccos(-(cursor[0] - self.x) / (1+numpy.sqrt(
+                (cursor[0] - self.x) * (cursor[0] - self.x) + (cursor[1] - self.y) * (cursor[1] - self.y))))
         polygon(screen, [255, 255, 150], [self.new_coord(0.3, 0.5), self.new_coord(0.5, 0.4), self.new_coord(0.4, 0.3)])
         polygon(screen, [255, 255, 150],
                 [self.new_coord(0.3, -0.5), self.new_coord(0.5, -0.4), self.new_coord(0.4, -0.3)])
