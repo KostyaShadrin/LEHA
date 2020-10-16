@@ -48,7 +48,7 @@ class Hero:
     fi = 0
     r = 80
     tsvet_tela = 0
-    tsvet_planseta = 3
+    tsvet_planseta = 2
     Hitbox = [[0, 0]] * 6
 
     def vverh(self):
@@ -93,7 +93,6 @@ class Hero:
                  self.new_coord(0.3, -0.1), self.new_coord(0.2, -0.4), self.new_coord(0.1, -0.5),
                  self.new_coord(0.3, -0.4), self.new_coord(0.4, -0.5), self.new_coord(0, -0.6),
                  self.new_coord(-0.2, -0.2)])
-        circle(screen, COLORS[8], [int(self.x), int(self.y)], int(0.2 * self.r))
 
     def risyi_equip(self):
         polygon(screen, COLORS[self.tsvet_planseta],
@@ -113,7 +112,9 @@ class Hero:
         line(screen, BLACK, self.new_coord(0.6, 0.3), self.new_coord(0.4, 0.4), 2)
         line(screen, BLACK, self.new_coord(0.675, 0.45), self.new_coord(0.475, 0.55), 2)
         line(screen, BLACK, self.new_coord(0.525, 0.15), self.new_coord(0.325, 0.25), 2)
-        circle(screen, BLACK, self.new_coord(0.45, -0.3), self.r // 50)
+        circle(screen, BLACK, self.new_coord(0.45, -0.3), int(self.r / 50))
+        circle(screen, COLORS[8], [int(self.x), int(self.y)], int(0.2 * self.r))
+        circle(screen, COLORS[self.tsvet_planseta + 1], self.new_coord(-0.075, 0), int(0.21 * self.r))
 
     def vystrel(self):
         for it in range(len(Magazin) - 1):
@@ -125,7 +126,7 @@ class AntiHero(Hero):
     x = 600
     y = 300
     fi = 0
-    r = 80
+    r = 100
     tsvet_tela = 9
     tsvet_planseta = 0
     Hitbox = [[0, 0]] * 6
@@ -137,41 +138,62 @@ class AntiHero(Hero):
 
     def risyi_epta(self):
         super().risyi()
+        circle(screen, COLORS[8], [int(self.x), int(self.y)], int(0.15 * self.r))
+        lines(screen, WHITE, False,
+              [super().new_coord(0.05, 0.25), super().new_coord(-0.05, 0.25), super().new_coord(-0.05, 0.3),
+               super().new_coord(0, 0.3), super().new_coord(0, 0.25)], 2)
+        lines(screen, WHITE, False,
+              [super().new_coord(0.05, 0.4), super().new_coord(-0.05, 0.4), super().new_coord(-0.05, 0.35),
+               super().new_coord(-0.05, 0.45)], 2)
+        polygon(screen, WHITE,
+                [super().new_coord(0, -0.275), super().new_coord(0.05, -0.4), super().new_coord(0.025, -0.375),
+                 super().new_coord(-0.025, -0.4), super().new_coord(-0.025, -0.45), super().new_coord(-0.05, -0.4),
+                 super().new_coord(0, -0.35), super().new_coord(-0.05, -0.3), super().new_coord(-0.025, -0.25),
+                 super().new_coord(-0.025, -0.3), super().new_coord(0, -0.325)])
 
     def shagi(self):
         if self.time_of_birthday - self.time_of_birthday < 20000 and self.live:
-            self.x += self.speed_x
-            self.y += self.speed_y
+            self.x += Vpuli / 3 * numpy.cos(self.fi)
+            self.y += Vpuli / 3 * numpy.sin(self.fi)
             if self.x < okno_x_min + self.r:
-                self.speed_x = -self.speed_x
-                self.x = self.x + 2 * int(round(self.speed_x))
+                self.fi = -self.fi
+                self.x += Vpuli / 3 * numpy.sin(self.fi)
+                self.y += Vpuli / 3 * numpy.cos(self.fi)
             if self.x > okno_x_max - self.r:
-                self.speed_x = -self.speed_x
-                self.x = self.x + 2 * int(round(self.speed_x))
+                self.x += Vpuli / 3 * numpy.sin(self.fi)
+                self.y += Vpuli / 3 * numpy.cos(self.fi)
             if self.y < okno_y_min + self.r:
-                self.speed_y = -self.speed_y
-                self.y = self.y + 2 * int(round(self.speed_y))
+                self.fi = -self.fi
+                self.x += Vpuli / 3 * numpy.sin(self.fi)
+                self.y += Vpuli / 3 * numpy.cos(self.fi)
             if self.y > okno_y_max - self.r:
-                self.speed_y = -self.speed_y
-                self.y = self.y + 2 * int(round(self.speed_y))
+                self.fi = -self.fi
+                self.x += Vpuli / 3 * numpy.sin(self.fi)
+                self.y += Vpuli / 3 * numpy.cos(self.fi)
 
 
 class Snaryad(AntiHero):
     def __init__(self):
-        self.x = super().x
-        self.y = super().y
-        self.fi = super().fi
-        self.r = 20
+        self.x = gopnic_1.x
+        self.y = gopnic_1.y
+        self.fi = 0
+        self.fi_povorota = - numpy.pi / 2 + gopnic_1.fi
+        self.r = 30
         self.Hitbox = [[0, 0]] * 4
         self.time_of_birthday = pygame.time.get_ticks()
         self.live = True
 
     def butylka(self):
-        polygon(screen, COLORS[7],
+        polygon(screen, COLORS[9],
                 [super().new_coord(0.05, 0.5), super().new_coord(0.05, 0.3), super().new_coord(0.15, 0.2),
                  super().new_coord(0.15, -0.5),
                  super().new_coord(-0.15, -0.5), super().new_coord(-0.15, 0.2), super().new_coord(-0.05, 0.3),
                  super().new_coord(-0.05, 0.5)])
+
+    def polet(self):
+        self.fi += 0.03
+        self.x += Vpuli / 2 * numpy.sin(-self.fi_povorota)
+        self.y += Vpuli / 2 * numpy.cos(-self.fi_povorota)
 
 
 def inside_check(x, y, a):
@@ -304,6 +326,9 @@ def draw_scren():
         shar_n.risyi()
     gopnic_1.ugol_epta((player.x, player.y))
     gopnic_1.risyi_epta()
+    gopnic_1.shagi()
+    vodka_1.butylka()
+    vodka_1.polet()
     screen.blit(f1.render('score = ' + str(score), 1, (255, 255, 255)), (0, 0))
     polygon(screen, [255, 255, 255],
             [[okno_x_min - 5, okno_y_min - 5], [okno_x_min - 5, okno_y_max + 5], [okno_x_max + 5, okno_y_max + 5],
@@ -331,6 +356,7 @@ if True:
     bullet_6 = Bullets()
     Magazin = [bullet_0, bullet_1, bullet_2, bullet_4, bullet_5, bullet_6]
     gopnic_1 = AntiHero()
+    vodka_1 = Snaryad()
 
 draw_scren()
 time_prev_update = pygame.time.get_ticks()
@@ -363,6 +389,8 @@ while not finished:
             bullet.dvizh()
         for shar in Protivniki:
             shar.dvizh()
+        if pygame.time.get_ticks() - time_prev_update > 10:
+            vodka_1 = Snaryad()
         time_prev_update = pygame.time.get_ticks()
         draw_scren()
 pygame.quit()
