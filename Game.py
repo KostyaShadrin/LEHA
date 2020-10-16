@@ -6,7 +6,6 @@ import os
 
 pygame.init()
 
-
 RED = (250, 0, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
@@ -26,14 +25,14 @@ exp_x1 = 0
 exp_y1 = 0
 Ecrx = 1400
 Ecry = 750
-os.environ['SDL_VIDEO_CENTERED'] = '1'#Центрирем
+os.environ['SDL_VIDEO_CENTERED'] = '1'  # Центрирем
 FPS = 60
 if FPS > 200:
     FPS = 200
 cursor_pos = [0, 0]
 screen = pygame.display.set_mode((Ecrx, Ecry))
 okno_x_min = 150
-okno_x_max = Ecrx-okno_x_min
+okno_x_max = Ecrx - okno_x_min
 okno_y_min = 100
 okno_y_max = 700
 Vsharikov = int(4 * 60 / FPS)
@@ -43,7 +42,9 @@ T_live_sharov = 5000
 
 pygame.font.SysFont('arial', 36)
 f1 = pygame.font.Font(None, 30)
-
+f2 = pygame.font.Font(None, 80)
+def draw_perezaryadis():
+    screen.blit(f2.render('ПЕРЕЗАРЯДИСЬ!!!', 1, (255, 0, 0)), (400, 0))
 
 class Hero:
     x = 200
@@ -119,10 +120,8 @@ class Hero:
         circle(screen, COLORS[8], [int(self.x), int(self.y)], int(0.2 * self.r))
         circle(screen, COLORS[self.tsvet_planseta + 1], self.new_coord(-0.075, 0), int(0.21 * self.r))
 
-    def vystrel(self):
-        for it in range(len(Magazin) - 1):
-            Magazin[it] = Magazin[it + 1]
-        Magazin[5] = Bullets()
+    def vystrel(self,N):
+        Magazin[N]=Bullets()
 
 
 class AntiHero(Hero):
@@ -233,8 +232,8 @@ def explosion(x, y, t):
 
 class SharOdin:
     def __init__(self):
-        self.x = randint(okno_x_min+200, okno_x_max - 200)
-        self.y = randint(okno_y_min+200, okno_y_max - 200)
+        self.x = randint(okno_x_min + 200, okno_x_max - 200)
+        self.y = randint(okno_y_min + 200, okno_y_max - 200)
         self.r = randint(40, 100) // 2
         self.speed_x = randint(-Vsharikov, Vsharikov)
         self.speed_y = randint(-Vsharikov, Vsharikov)
@@ -296,6 +295,7 @@ class SharOdin:
 
 class Bullets:
     def __init__(self):
+        self.N=0
         self.x = player.x
         self.y = player.y
         self.r = 5
@@ -308,20 +308,23 @@ class Bullets:
         if (self.x > okno_x_min) and (self.x < okno_x_max) and self.live:
             if (self.y > okno_y_min) and (self.y < okno_y_max):
                 self.y += self.speed * numpy.sin(self.fi)
-            else:
-                self.live = False
-            self.x += self.speed * numpy.cos(self.fi)
-        else:
-            self.live = False
+                self.x += self.speed * numpy.cos(self.fi)
+        if not self.live:
+            self.x = 10
+            self.y = 200 + 50 * self.N
+            self.r = 10
+            self.fi = 0
 
     def risyi(self):
-        if self.live:
-            circle(screen, self.color, (int(self.x), int(self.y)), self.r)
+        circle(screen, self.color, (int(self.x), int(self.y)), self.r)
+
 
 
 def draw_scren():
     screen.fill([200, 200, 200])
     player.ugol(cursor_pos)
+    if not gotovnost_k_strelbye:
+        draw_perezaryadis()
     player.risyi()
     player.risyi_equip()
     for bullet_d in Magazin:
@@ -333,36 +336,57 @@ def draw_scren():
     gopnic_1.shagi()
     vodka_1.butylka()
     vodka_1.polet()
+    draw_magazin()
     screen.blit(f1.render('score = ' + str(score), 1, (255, 255, 255)), (0, 0))
     polygon(screen, [255, 255, 255],
             [[okno_x_min - 5, okno_y_min - 5], [okno_x_min - 5, okno_y_max + 5], [okno_x_max + 5, okno_y_max + 5],
              [okno_x_max + 5, okno_y_min - 5]], 5)
     pygame.display.update()
 
+def dvigai_objcts():
+    if keys[pygame.K_w]:
+        player.vverh()
+    if keys[pygame.K_a]:
+        player.vlevo()
+    if keys[pygame.K_s]:
+        player.vniz()
+    if keys[pygame.K_d]:
+        player.vpravo()
+    for bullet in Magazin:
+        bullet.dvizh()
+    for shar in Protivniki:
+        shar.dvizh()
 
+def reload():
+    for i in range(k_bullets):
+        Magazin[i].live=False
+        Magazin[i].N=i
 clock = pygame.time.Clock()
 finished = False
 player = Hero()
-if True:
-    shar_0 = SharOdin()
-    shar_1 = SharOdin()
-    shar_2 = SharOdin()
-    shar_3 = SharOdin()
-    shar_4 = SharOdin()
-    shar_5 = SharOdin()
-    Protivniki = [shar_0, shar_1, shar_2, shar_3, shar_4, shar_5]
-    bullet_0 = Bullets()
-    bullet_1 = Bullets()
-    bullet_2 = Bullets()
-    bullet_3 = Bullets()
-    bullet_4 = Bullets()
-    bullet_5 = Bullets()
-    bullet_6 = Bullets()
-    Magazin = [bullet_0, bullet_1, bullet_2, bullet_4, bullet_5, bullet_6]
-    gopnic_1 = AntiHero()
-    vodka_1 = Snaryad()
+k_bullets = 7
+Magazin = [Bullets()] * k_bullets
+k_sharov = 6
+Protivniki = [SharOdin()] * k_sharov
+k_antihero = 1
+for i in range(k_bullets):
+    Magazin[i] = Bullets()
+    Magazin[i].live = False
+    Magazin[i].N=i
+gotovnost_k_strelbye=True
+for i in range(k_sharov):
+    Protivniki[i] = SharOdin()
+
+gopnic_1 = AntiHero()
+vodka_1 = Snaryad()
+def draw_magazin():
+    for i in range(len(Magazin)):
+        if not Magazin[i].live:
+            Magazin[i].risyi()
+
 
 draw_scren()
+time_last_reload = pygame.time.get_ticks()
 time_prev_update = pygame.time.get_ticks()
 while not finished:
     keys = pygame.key.get_pressed()
@@ -379,20 +403,22 @@ while not finished:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if (event.button == 1) or (event.button == 3):
                 cursor_pos = event.pos
-                player.vystrel()
+                odnorazovii_kostyl=True
+                for i in range(k_bullets):
+                    if not Magazin[i].live and odnorazovii_kostyl:
+                        player.vystrel(i)
+                        odnorazovii_kostyl=False
+                if odnorazovii_kostyl:
+                    gotovnost_k_strelbye=False
+
+
+        if keys[pygame.K_r]and pygame.time.get_ticks()-time_last_reload>1000:
+            time_last_reload=pygame.time.get_ticks()
+            reload()
+            gotovnost_k_strelbye=True
+
     if pygame.time.get_ticks() - time_prev_update > 500 / FPS:
-        if keys[pygame.K_w]:
-            player.vverh()
-        if keys[pygame.K_a]:
-            player.vlevo()
-        if keys[pygame.K_s]:
-            player.vniz()
-        if keys[pygame.K_d]:
-            player.vpravo()
-        for bullet in Magazin:
-            bullet.dvizh()
-        for shar in Protivniki:
-            shar.dvizh()
+        dvigai_objcts()
         if pygame.time.get_ticks() - time_prev_update > 10:
             vodka_1 = Snaryad()
         time_prev_update = pygame.time.get_ticks()
