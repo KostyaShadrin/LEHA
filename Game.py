@@ -25,7 +25,7 @@ exp_x1 = 0
 exp_y1 = 0
 Ecrx = 1400
 Ecry = 750
-os.environ['SDL_VIDEO_CENTERED'] = '1'  # Центрирем
+os.environ['SDL_VIDEO_CENTERED'] = '1'#Центрирyем
 FPS = 60
 if FPS > 200:
     FPS = 200
@@ -230,6 +230,15 @@ def explosion(x, y, t):
                     int(y + 0.15 * t * numpy.sin(fi) + dobavka_y)], 10)
 
 
+def lavka(x, y, r=70):
+    polygon(screen, [184, 16, 0], [[x, y], [x + 3*r, y], [x+3*r, y + r], [x, y + r]])
+    polygon(screen, BLACK, [[x, y], [x + 3*r, y], [x+3*r, y + r], [x, y + r]], 5)
+    for doska in range(10):
+        line(screen, BLACK, [x, y + doska * r // 10], [x + 3 * r, y + doska * r // 10], 2)
+    polygon(screen, BLACK, [[x + 3.4 * r, y + 0.3 * r], [x + 3.4 * r, y + 0.8 * r], [x + 3.9 * r, y + 0.8 * r], [x + 3.9 * r, y + 0.3 * r]])
+
+
+
 class SharOdin:
     def __init__(self):
         self.x = randint(okno_x_min + 200, okno_x_max - 200)
@@ -321,7 +330,9 @@ class Bullets:
 
 
 def draw_scren():
-    screen.fill([200, 200, 200])
+    screen.fill([136, 136, 136])
+    for skamya in range(10):
+        lavka(100 + 300 * (skamya % 5), 50 + 620 * (skamya // 5))
     player.ugol(cursor_pos)
     if not gotovnost_k_strelbye:
         draw_perezaryadis()
@@ -338,9 +349,10 @@ def draw_scren():
     vodka_1.polet()
     draw_magazin()
     screen.blit(f1.render('score = ' + str(score), 1, (255, 255, 255)), (0, 0))
-    polygon(screen, [255, 255, 255],
-            [[okno_x_min - 5, okno_y_min - 5], [okno_x_min - 5, okno_y_max + 5], [okno_x_max + 5, okno_y_max + 5],
-             [okno_x_max + 5, okno_y_min - 5]], 5)
+    #отсюда взять параметры для лавок
+    #polygon(screen, [255, 255, 255],
+            #[[okno_x_min - 5, okno_y_min - 5], [okno_x_min - 5, okno_y_max + 5], [okno_x_max + 5, okno_y_max + 5],
+             #[okno_x_max + 5, okno_y_min - 5]], 5)
     pygame.display.update()
 
 def dvigai_objcts():
