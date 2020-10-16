@@ -237,13 +237,13 @@ class SharOdin:
         if self.live:
             if pygame.time.get_ticks() - self.time_of_birthday < 3 * T_live_sharov / 4:
                 circle(screen,
-                       [50 + ((pygame.time.get_ticks() - self.time_of_birthday) * 200 / T_live_sharov % 150), 0, 0],
+                       [50 + ((pygame.time.get_ticks() - self.time_of_birthday) * 200 / T_live_sharov % 150), 255, 0],
                        [int(self.x), int(self.y)], self.r)
                 circle(screen, [0, 0, 0], [int(self.x), int(self.y)],
                        self.r + 3, 3)
             if (pygame.time.get_ticks() - self.time_of_birthday > 3 * T_live_sharov / 4) and (
                     pygame.time.get_ticks() - self.time_of_birthday < T_live_sharov):
-                circle(screen, [255, 255, 0], [int(self.x), int(self.y)],
+                circle(screen, [255, 0, 0], [int(self.x), int(self.y)],
                        self.r)
                 circle(screen, [0, 0, 0], [int(self.x), int(self.y)],
                        self.r + 3, 3)
