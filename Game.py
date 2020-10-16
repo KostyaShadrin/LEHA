@@ -14,7 +14,8 @@ CYAN = (0, 255, 255)
 BLACK = (0, 0, 0)
 LBLUE = (62, 195, 255)
 WHITE = (255, 255, 255)
-COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN, LBLUE, WHITE]
+KOJA = (255, 255, 150)
+COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN, LBLUE, WHITE, KOJA, BLACK]
 
 score = 0
 exp_x = 0
@@ -42,16 +43,13 @@ f1 = pygame.font.Font(None, 30)
 
 
 class Hero:
-    def __init__(self):
-        self.x = 200
-        self.y = 300
-        self.fi = 0
-        self.r = 80
-        self.tsvet_tela = COLORS[0]
-        self.tsvet_planseta = COLORS[3]
-        self.gun_x = int(self.x + 2 * self.r * numpy.cos(self.fi))
-        self.gun_y = int(self.y + 2 * self.r * numpy.sin(self.fi))
-        self.Hitbox = [[0, 0]] * 6
+    x = 200
+    y = 300
+    fi = 0
+    r = 80
+    tsvet_tela = 0
+    tsvet_planseta = 3
+    Hitbox = [[0, 0]] * 6
 
     def vverh(self):
         if self.y > okno_y_min + self.r // 2:
@@ -77,30 +75,35 @@ class Hero:
         return [self.new_coord(0.3, 0), self.new_coord(0.3, 0.5), self.new_coord(-0.2, 0.5),
                 self.new_coord(-0.2, 0), self.new_coord(-0.2, -0.5), self.new_coord(0.3, -0.5)]
 
-    def risyi(self, cursor):
+    def ugol(self, cursor):
         if self.y <= cursor[1]:
-            self.fi = numpy.arccos((cursor[0] - self.x) / (1+numpy.sqrt(
+            self.fi = numpy.arccos((cursor[0] - self.x) / (1 + numpy.sqrt(
                 (cursor[0] - self.x) * (cursor[0] - self.x) + (cursor[1] - self.y) * (cursor[1] - self.y))))
         if self.y > cursor[1]:
-            self.fi = numpy.pi + numpy.arccos(-(cursor[0] - self.x) / (1+numpy.sqrt(
-                (cursor[0] - self.x) * (cursor[0] - self.x) + (cursor[1] - self.y) * (cursor[1] - self.y))))
-        polygon(screen, [255, 255, 150], [self.new_coord(0.3, 0.5), self.new_coord(0.5, 0.4), self.new_coord(0.4, 0.3)])
-        polygon(screen, [255, 255, 150],
+            self.fi = numpy.pi + numpy.arccos(-(cursor[0] - self.x) / numpy.sqrt(
+                (cursor[0] - self.x) * (cursor[0] - self.x) + (cursor[1] - self.y) * (cursor[1] - self.y)))
+
+    def risyi(self):
+        polygon(screen, COLORS[8], [self.new_coord(0.3, 0.5), self.new_coord(0.5, 0.4), self.new_coord(0.4, 0.3)])
+        polygon(screen, COLORS[8],
                 [self.new_coord(0.3, -0.5), self.new_coord(0.5, -0.4), self.new_coord(0.4, -0.3)])
-        polygon(screen, self.tsvet_tela,
+        polygon(screen, COLORS[self.tsvet_tela],
                 [self.new_coord(-0.2, 0.2), self.new_coord(0, 0.6), self.new_coord(0.4, 0.5), self.new_coord(0.3, 0.4),
                  self.new_coord(0.1, 0.5), self.new_coord(0.2, 0.4), self.new_coord(0.3, 0.1),
                  self.new_coord(0.3, -0.1), self.new_coord(0.2, -0.4), self.new_coord(0.1, -0.5),
                  self.new_coord(0.3, -0.4), self.new_coord(0.4, -0.5), self.new_coord(0, -0.6),
                  self.new_coord(-0.2, -0.2)])
-        polygon(screen, self.tsvet_planseta,
+        circle(screen, COLORS[8], [int(self.x), int(self.y)], int(0.2 * self.r))
+
+    def risyi_equip(self):
+        polygon(screen, COLORS[self.tsvet_planseta],
                 [self.new_coord(0.3, 0.2), self.new_coord(0.5, 0.6), self.new_coord(0.7, 0.5),
                  self.new_coord(0.5, 0.1)])
-        line(screen, self.tsvet_planseta, self.new_coord(0.45, -0.3), self.new_coord(0.45, -0.6), self.r // 20)
-        circle(screen, [255, 255, 150], [int(self.x), int(self.y)], int(0.2 * self.r))
-        polygon(screen, WHITE, [self.new_coord(0.325, 0.25), self.new_coord(0.525, 0.15), self.new_coord(0.675, 0.45),
-                                self.new_coord(0.475, 0.55)])
-        lines(screen, BLACK, False,
+        line(screen, COLORS[self.tsvet_planseta], self.new_coord(0.45, -0.3), self.new_coord(0.45, -0.6), self.r // 20)
+        polygon(screen, COLORS[7],
+                [self.new_coord(0.325, 0.25), self.new_coord(0.525, 0.15), self.new_coord(0.675, 0.45),
+                 self.new_coord(0.475, 0.55)])
+        lines(screen, COLORS[9], False,
               [self.new_coord(0.6, 0.3), self.new_coord(0.625, 0.45), self.new_coord(0.525, 0.2),
                self.new_coord(0.585, 0.47),
                self.new_coord(0.485, 0.22), self.new_coord(0.545, 0.49), self.new_coord(0.445, 0.24),
@@ -116,6 +119,59 @@ class Hero:
         for it in range(len(Magazin) - 1):
             Magazin[it] = Magazin[it + 1]
         Magazin[5] = Bullets()
+
+
+class AntiHero(Hero):
+    x = 600
+    y = 300
+    fi = 0
+    r = 80
+    tsvet_tela = 9
+    tsvet_planseta = 0
+    Hitbox = [[0, 0]] * 6
+    time_of_birthday = pygame.time.get_ticks()
+    live = True
+
+    def ugol_epta(self, hero):
+        super().ugol(hero)
+
+    def risyi_epta(self):
+        super().risyi()
+
+    def shagi(self):
+        if self.time_of_birthday - self.time_of_birthday < 20000 and self.live:
+            self.x += self.speed_x
+            self.y += self.speed_y
+            if self.x < okno_x_min + self.r:
+                self.speed_x = -self.speed_x
+                self.x = self.x + 2 * int(round(self.speed_x))
+            if self.x > okno_x_max - self.r:
+                self.speed_x = -self.speed_x
+                self.x = self.x + 2 * int(round(self.speed_x))
+            if self.y < okno_y_min + self.r:
+                self.speed_y = -self.speed_y
+                self.y = self.y + 2 * int(round(self.speed_y))
+            if self.y > okno_y_max - self.r:
+                self.speed_y = -self.speed_y
+                self.y = self.y + 2 * int(round(self.speed_y))
+
+
+class Snaryad(AntiHero):
+    def __init__(self):
+        self.x = super().x
+        self.y = super().y
+        self.fi = super().fi
+        self.r = 20
+        self.Hitbox = [[0, 0]] * 4
+        self.time_of_birthday = pygame.time.get_ticks()
+        self.live = True
+
+    def butylka(self):
+        polygon(screen, COLORS[7],
+                [super().new_coord(0.05, 0.5), super().new_coord(0.05, 0.3), super().new_coord(0.15, 0.2),
+                 super().new_coord(0.15, -0.5),
+                 super().new_coord(-0.15, -0.5), super().new_coord(-0.15, 0.2), super().new_coord(-0.05, 0.3),
+                 super().new_coord(-0.05, 0.5)])
 
 
 def inside_check(x, y, a):
@@ -147,8 +203,7 @@ def explosion(x, y, t):
             dobavka_y = randint(-10, 10)
             circle(screen, [255, 255, 255],
                    [int(x + 0.15 * t * numpy.cos(fi) + dobavka_x),
-                        int(y + 0.15 * t * numpy.sin(fi) + dobavka_y)], 10)
-
+                    int(y + 0.15 * t * numpy.sin(fi) + dobavka_y)], 10)
 
 
 class SharOdin:
@@ -182,13 +237,13 @@ class SharOdin:
         if self.live:
             if pygame.time.get_ticks() - self.time_of_birthday < 3 * T_live_sharov / 4:
                 circle(screen,
-                       [50 + ((pygame.time.get_ticks() - self.time_of_birthday) * 200 / T_live_sharov % 150), 0, 0],
+                       [50 + ((pygame.time.get_ticks() - self.time_of_birthday) * 200 / T_live_sharov % 150), 255, 0],
                        [int(self.x), int(self.y)], self.r)
                 circle(screen, [0, 0, 0], [int(self.x), int(self.y)],
                        self.r + 3, 3)
             if (pygame.time.get_ticks() - self.time_of_birthday > 3 * T_live_sharov / 4) and (
                     pygame.time.get_ticks() - self.time_of_birthday < T_live_sharov):
-                circle(screen, [255, 255, 0], [int(self.x), int(self.y)],
+                circle(screen, [255, 0, 0], [int(self.x), int(self.y)],
                        self.r)
                 circle(screen, [0, 0, 0], [int(self.x), int(self.y)],
                        self.r + 3, 3)
@@ -196,7 +251,8 @@ class SharOdin:
                 self.live = False
         else:
             for dot in player.hitbox():
-                if (dot[0] - self.x) ** 2 + (dot[1]-self.y) ** 2 < (0.15 * (pygame.time.get_ticks()-self.time_of_birthday-T_live_sharov)) ** 2 and not self.live:
+                if (dot[0] - self.x) ** 2 + (dot[1] - self.y) ** 2 < (0.15 * (
+                        pygame.time.get_ticks() - self.time_of_birthday - T_live_sharov)) ** 2 and not self.live:
                     global score
                     score -= 10
                     self.__init__()
@@ -240,11 +296,15 @@ class Bullets:
 
 def draw_scren():
     screen.fill([200, 200, 200])
-    player.risyi(cursor_pos)
+    player.ugol(cursor_pos)
+    player.risyi()
+    player.risyi_equip()
     for bullet_d in Magazin:
         bullet_d.risyi()
     for shar_n in Protivniki:
         shar_n.risyi()
+    gopnic_1.ugol_epta((player.x, player.y))
+    gopnic_1.risyi_epta()
     screen.blit(f1.render('score = ' + str(score), 1, (255, 255, 255)), (0, 0))
     polygon(screen, [255, 255, 255],
             [[okno_x_min - 5, okno_y_min - 5], [okno_x_min - 5, okno_y_max + 5], [okno_x_max + 5, okno_y_max + 5],
@@ -271,6 +331,7 @@ if True:
     bullet_5 = Bullets()
     bullet_6 = Bullets()
     Magazin = [bullet_0, bullet_1, bullet_2, bullet_4, bullet_5, bullet_6]
+    gopnic_1 = AntiHero()
 
 draw_scren()
 time_prev_update = pygame.time.get_ticks()
