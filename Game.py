@@ -234,7 +234,8 @@ class Bullets:
             self.live = False
 
     def risyi(self):
-        circle(screen, self.color, (int(self.x), int(self.y)), self.r)
+        if self.live:
+            circle(screen, self.color, (int(self.x), int(self.y)), self.r)
 
 
 def draw_scren():
