@@ -2,8 +2,10 @@ import pygame
 from pygame.draw import *
 from random import randint
 import numpy
+import os
 
 pygame.init()
+
 
 RED = (250, 0, 0)
 BLUE = (0, 0, 255)
@@ -22,17 +24,18 @@ exp_x = 0
 exp_y = 0
 exp_x1 = 0
 exp_y1 = 0
-Ecrx = 1000
-Ecry = 700
+Ecrx = 1400
+Ecry = 750
+os.environ['SDL_VIDEO_CENTERED'] = '1'#Центрирем
 FPS = 60
 if FPS > 200:
     FPS = 200
 cursor_pos = [0, 0]
 screen = pygame.display.set_mode((Ecrx, Ecry))
-okno_x_min = 100
-okno_x_max = 900
+okno_x_min = 150
+okno_x_max = Ecrx-okno_x_min
 okno_y_min = 100
-okno_y_max = 600
+okno_y_max = 700
 Vsharikov = int(4 * 60 / FPS)
 Vchelika = 3 * 60 / FPS
 Vpuli = 7 * 60 / FPS
@@ -208,8 +211,8 @@ def explosion(x, y, t):
 
 class SharOdin:
     def __init__(self):
-        self.x = randint(200, Ecrx - 200)
-        self.y = randint(200, Ecry - 200)
+        self.x = randint(okno_x_min+200, okno_x_max - 200)
+        self.y = randint(okno_y_min+200, okno_y_max - 200)
         self.r = randint(40, 100) // 2
         self.speed_x = randint(-Vsharikov, Vsharikov)
         self.speed_y = randint(-Vsharikov, Vsharikov)
