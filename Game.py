@@ -413,8 +413,9 @@ def draw_scren():
         Vragi[i].ugol_epta((player.x, player.y))
         Vragi[i].risyi_epta()
         Vragi[i].shagi()
-    vodka_1.butylka()
-    vodka_1.polet()
+    for h in range(k_butilok):
+        Butilki[h].butylka()
+        Butilki[h].polet()
     draw_magazin()
     screen.blit(f1.render('score = ' + str(score), 1, (255, 255, 255)), (0, 0))
     # отсюда взять параметры для лавок
@@ -454,6 +455,8 @@ k_sharov = 6
 Dolgi = [SharOdin()] * k_sharov
 k_antihero = 1
 Vragi = [AntiHero()] * k_antihero
+k_butilok = 1
+Butilki = [Snaryad()] * k_butilok
 for i in range(k_bullets):
     Magazin[i] = Bullets()
     Magazin[i].live = False
@@ -462,7 +465,6 @@ gotovnost_k_strelbye = True
 for i in range(k_sharov):
     Dolgi[i] = SharOdin()
 
-vodka_1 = Snaryad()
 
 
 def draw_magazin():
@@ -488,7 +490,11 @@ while not finished:
                 Vragi[ik] = AntiHero()
                 Vragi[ik].x = randint(500, 1000)
                 Vragi[ik].y = randint(300, 800)
-                print("popal")
+        for im in range(k_butilok):
+            if (Butilki[im].x-Magazin[j].x)**2 + (Butilki[im].y - Magazin[j].y)**2<200:
+                score += 1
+                Butilki[im] = Snaryad()
+
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -513,9 +519,10 @@ while not finished:
 
     if pygame.time.get_ticks() - time_prev_update > 500 / FPS:
         dvigai_objcts()
-        if pygame.time.get_ticks() - time_prev_bottle > 1000 * 50 / FPS:
-            time_prev_bottle = pygame.time.get_ticks()
-            vodka_1 = Snaryad()
+        for i in range (k_antihero):
+            if pygame.time.get_ticks() - time_prev_bottle > 4000 * 50 / FPS:
+                time_prev_bottle = pygame.time.get_ticks()
+                Butilki[i] = Snaryad()
         time_prev_update = pygame.time.get_ticks()
         draw_scren()
 pygame.quit()
