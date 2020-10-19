@@ -265,10 +265,11 @@ def explosion(x, y, t):
 
 
 def raspolojenie_butylok(x, y, r):
-    Decoratsii = [[1, 1], [1, 1], [1, 1], [1, 1], [1, 1]]
+    Decoratsii = [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]]
     for steclo in Decoratsii:
         steclo[0] = randint(x - r, x + r)
         steclo[1] = randint(y - r // 3, y + r // 3)
+        steclo[2] = randint(0, 30)
     return Decoratsii
 
 
@@ -276,7 +277,6 @@ Decor = [raspolojenie_butylok(0, 0, 100), raspolojenie_butylok(0, 0, 100), raspo
               raspolojenie_butylok(0, 0, 100), raspolojenie_butylok(0, 0, 100), raspolojenie_butylok(0, 0, 100),
               raspolojenie_butylok(0, 0, 100), raspolojenie_butylok(0, 0, 100), raspolojenie_butylok(0, 0, 100),
               raspolojenie_butylok(0, 0, 100)]
-
 
 def lavka(x, y, r, i):
     polygon(screen, [184, 16, 0], [[x, y], [x + 3 * r, y], [x + 3 * r, y + r], [x, y + r]])
@@ -286,7 +286,7 @@ def lavka(x, y, r, i):
     polygon(screen, BLACK, [[x + 3.4 * r, y + 0.3 * r], [x + 3.4 * r, y + 0.8 * r], [x + 3.9 * r, y + 0.8 * r],
                             [x + 3.9 * r, y + 0.3 * r]])
     for steclo in Decor[i]:
-        polygon(screen, COLORS[9],
+        polygon(screen, [50, 25, 25],
                 [(x + steclo[0] + 0.05 * r // 2, y + steclo[1] + 0.5 * r // 2),
                  (x + steclo[0] + 0.05 * r // 2, y + steclo[1] + 0.3 * r // 2),
                  (x + steclo[0] + 0.15 * r // 2, y + steclo[1] + 0.2 * r // 2),
