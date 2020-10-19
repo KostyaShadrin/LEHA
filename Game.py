@@ -23,9 +23,9 @@ exp_x = 0
 exp_y = 0
 exp_x1 = 0
 exp_y1 = 0
-Ecrx = 1400
-Ecry = 750
-os.environ['SDL_VIDEO_CENTERED'] = '1'#Центрирyем
+Ecrx = 1300
+Ecry = 700
+os.environ['SDL_VIDEO_CENTERED'] = '1'  # Центрирyем
 FPS = 60
 if FPS > 200:
     FPS = 200
@@ -43,8 +43,11 @@ T_live_sharov = 5000
 pygame.font.SysFont('arial', 36)
 f1 = pygame.font.Font(None, 30)
 f2 = pygame.font.Font(None, 80)
+
+
 def draw_perezaryadis():
     screen.blit(f2.render('ПЕРЕЗАРЯДИСЬ!!!', 1, (255, 0, 0)), (400, 0))
+
 
 class Hero:
     x = 200
@@ -120,8 +123,8 @@ class Hero:
         circle(screen, COLORS[8], [int(self.x), int(self.y)], int(0.2 * self.r))
         circle(screen, COLORS[self.tsvet_planseta + 1], self.new_coord(-0.075, 0), int(0.21 * self.r))
 
-    def vystrel(self,N):
-        Magazin[N]=Bullets()
+    def vystrel(self, N):
+        Magazin[N] = Bullets()
 
 
 class AntiHero(Hero):
@@ -134,6 +137,7 @@ class AntiHero(Hero):
     Hitbox = [[0, 0]] * 6
     time_of_birthday = pygame.time.get_ticks()
     live = True
+    type_of_enemy = randint(0, 1)
 
     def ugol_epta(self, hero):
         super().ugol(hero)
@@ -152,26 +156,21 @@ class AntiHero(Hero):
                  super().new_coord(-0.025, -0.4), super().new_coord(-0.025, -0.45), super().new_coord(-0.05, -0.4),
                  super().new_coord(0, -0.35), super().new_coord(-0.05, -0.3), super().new_coord(-0.025, -0.25),
                  super().new_coord(-0.025, -0.3), super().new_coord(0, -0.325)])
+        if self.type_of_enemy:
+            circle(screen, RED, super().new_coord(0.25, 0.35), self.r // 10)
+            circle(screen, BLACK, super().new_coord(0.25, 0.35), 2)
+            circle(screen, RED, super().new_coord(0.25, -0.35), self.r // 10)
+            circle(screen, BLACK, super().new_coord(0.25, -0.35), 2)
+            circle(screen, RED, super().new_coord(0.3, 0.2), self.r // 10)
+            circle(screen, BLACK, super().new_coord(0.3, 0.2), 2)
+            circle(screen, RED, super().new_coord(0.3, -0.2), self.r // 10)
+            circle(screen, BLACK, super().new_coord(0.3, -0.2), 2)
+
 
     def shagi(self):
         if self.time_of_birthday - self.time_of_birthday < 20000 and self.live:
             self.x += Vpuli / 3 * numpy.cos(self.fi)
             self.y += Vpuli / 3 * numpy.sin(self.fi)
-            if self.x < okno_x_min + self.r:
-                self.fi = -self.fi
-                self.x += Vpuli / 3 * numpy.sin(self.fi)
-                self.y += Vpuli / 3 * numpy.cos(self.fi)
-            if self.x > okno_x_max - self.r:
-                self.x += Vpuli / 3 * numpy.sin(self.fi)
-                self.y += Vpuli / 3 * numpy.cos(self.fi)
-            if self.y < okno_y_min + self.r:
-                self.fi = -self.fi
-                self.x += Vpuli / 3 * numpy.sin(self.fi)
-                self.y += Vpuli / 3 * numpy.cos(self.fi)
-            if self.y > okno_y_max - self.r:
-                self.fi = -self.fi
-                self.x += Vpuli / 3 * numpy.sin(self.fi)
-                self.y += Vpuli / 3 * numpy.cos(self.fi)
 
 
 class Snaryad(AntiHero):
@@ -231,12 +230,12 @@ def explosion(x, y, t):
 
 
 def lavka(x, y, r=70):
-    polygon(screen, [184, 16, 0], [[x, y], [x + 3*r, y], [x+3*r, y + r], [x, y + r]])
-    polygon(screen, BLACK, [[x, y], [x + 3*r, y], [x+3*r, y + r], [x, y + r]], 5)
+    polygon(screen, [184, 16, 0], [[x, y], [x + 3 * r, y], [x + 3 * r, y + r], [x, y + r]])
+    polygon(screen, BLACK, [[x, y], [x + 3 * r, y], [x + 3 * r, y + r], [x, y + r]], 5)
     for doska in range(10):
         line(screen, BLACK, [x, y + doska * r // 10], [x + 3 * r, y + doska * r // 10], 2)
-    polygon(screen, BLACK, [[x + 3.4 * r, y + 0.3 * r], [x + 3.4 * r, y + 0.8 * r], [x + 3.9 * r, y + 0.8 * r], [x + 3.9 * r, y + 0.3 * r]])
-
+    polygon(screen, BLACK, [[x + 3.4 * r, y + 0.3 * r], [x + 3.4 * r, y + 0.8 * r], [x + 3.9 * r, y + 0.8 * r],
+                            [x + 3.9 * r, y + 0.3 * r]])
 
 
 class SharOdin:
@@ -304,7 +303,7 @@ class SharOdin:
 
 class Bullets:
     def __init__(self):
-        self.N=0
+        self.N = 0
         self.x = player.x
         self.y = player.y
         self.r = 5
@@ -328,7 +327,6 @@ class Bullets:
         circle(screen, self.color, (int(self.x), int(self.y)), self.r)
 
 
-
 def draw_scren():
     screen.fill([136, 136, 136])
     for skamya in range(10):
@@ -349,11 +347,12 @@ def draw_scren():
     vodka_1.polet()
     draw_magazin()
     screen.blit(f1.render('score = ' + str(score), 1, (255, 255, 255)), (0, 0))
-    #отсюда взять параметры для лавок
-    #polygon(screen, [255, 255, 255],
-            #[[okno_x_min - 5, okno_y_min - 5], [okno_x_min - 5, okno_y_max + 5], [okno_x_max + 5, okno_y_max + 5],
-             #[okno_x_max + 5, okno_y_min - 5]], 5)
+    # отсюда взять параметры для лавок
+    # polygon(screen, [255, 255, 255],
+    # [[okno_x_min - 5, okno_y_min - 5], [okno_x_min - 5, okno_y_max + 5], [okno_x_max + 5, okno_y_max + 5],
+    # [okno_x_max + 5, okno_y_min - 5]], 5)
     pygame.display.update()
+
 
 def dvigai_objcts():
     if keys[pygame.K_w]:
@@ -369,10 +368,13 @@ def dvigai_objcts():
     for shar in Protivniki:
         shar.dvizh()
 
+
 def reload():
     for i in range(k_bullets):
-        Magazin[i].live=False
-        Magazin[i].N=i
+        Magazin[i].live = False
+        Magazin[i].N = i
+
+
 clock = pygame.time.Clock()
 finished = False
 player = Hero()
@@ -384,13 +386,15 @@ k_antihero = 1
 for i in range(k_bullets):
     Magazin[i] = Bullets()
     Magazin[i].live = False
-    Magazin[i].N=i
-gotovnost_k_strelbye=True
+    Magazin[i].N = i
+gotovnost_k_strelbye = True
 for i in range(k_sharov):
     Protivniki[i] = SharOdin()
 
 gopnic_1 = AntiHero()
 vodka_1 = Snaryad()
+
+
 def draw_magazin():
     for i in range(len(Magazin)):
         if not Magazin[i].live:
@@ -415,23 +419,22 @@ while not finished:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if (event.button == 1) or (event.button == 3):
                 cursor_pos = event.pos
-                odnorazovii_kostyl=True
+                odnorazovii_kostyl = True
                 for i in range(k_bullets):
                     if not Magazin[i].live and odnorazovii_kostyl:
                         player.vystrel(i)
-                        odnorazovii_kostyl=False
+                        odnorazovii_kostyl = False
                 if odnorazovii_kostyl:
-                    gotovnost_k_strelbye=False
+                    gotovnost_k_strelbye = False
 
-
-        if keys[pygame.K_r]and pygame.time.get_ticks()-time_last_reload>1000:
-            time_last_reload=pygame.time.get_ticks()
+        if keys[pygame.K_r] and pygame.time.get_ticks() - time_last_reload > 1000:
+            time_last_reload = pygame.time.get_ticks()
             reload()
-            gotovnost_k_strelbye=True
+            gotovnost_k_strelbye = True
 
     if pygame.time.get_ticks() - time_prev_update > 500 / FPS:
         dvigai_objcts()
-        if pygame.time.get_ticks() - time_prev_update > 10:
+        if (pygame.time.get_ticks() - time_prev_update > 10) and not gopnic_1.type_of_enemy:
             vodka_1 = Snaryad()
         time_prev_update = pygame.time.get_ticks()
         draw_scren()
