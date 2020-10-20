@@ -26,7 +26,7 @@ exp_y1 = 0
 Ecrx = 1400
 Ecry = 750
 os.environ['SDL_VIDEO_CENTERED'] = '1'  # Центрирyем
-FPS = 60
+FPS = 50
 if FPS > 200:
     FPS = 200
 cursor_pos = [0, 0]
@@ -125,7 +125,6 @@ class Hero:
     def check(self, x, y):
         self.Hitbox = [self.new_coord(0.3, 0), self.new_coord(0.3, 0.5), self.new_coord(-0.2, 0.5),
                        self.new_coord(-0.2, 0), self.new_coord(-0.2, -0.5), self.new_coord(0.3, -0.5)]
-        print(self.Hitbox)
         if inside_check(x, y, self.Hitbox):
             return 1
         else:
@@ -163,15 +162,6 @@ class AntiHero(Hero):
                  super().new_coord(-0.025, -0.4), super().new_coord(-0.025, -0.45), super().new_coord(-0.05, -0.4),
                  super().new_coord(0, -0.35), super().new_coord(-0.05, -0.3), super().new_coord(-0.025, -0.25),
                  super().new_coord(-0.025, -0.3), super().new_coord(0, -0.325)])
-        if self.type_of_enemy:
-            circle(screen, RED, super().new_coord(0.25, 0.35), self.r // 10)
-            circle(screen, BLACK, super().new_coord(0.25, 0.35), 2)
-            circle(screen, RED, super().new_coord(0.25, -0.35), self.r // 10)
-            circle(screen, BLACK, super().new_coord(0.25, -0.35), 2)
-            circle(screen, RED, super().new_coord(0.3, 0.2), self.r // 10)
-            circle(screen, BLACK, super().new_coord(0.3, 0.2), 2)
-            circle(screen, RED, super().new_coord(0.3, -0.2), self.r // 10)
-            circle(screen, BLACK, super().new_coord(0.3, -0.2), 2)
 
     def shagi(self):
         if self.time_of_birthday - self.time_of_birthday < 20000 and self.live:
@@ -203,12 +193,13 @@ class AntiHero(Hero):
 
 
 class Snaryad(AntiHero):
+    N=0
     def __init__(self):
-        self.x = Vragi[0].x
-        self.y = Vragi[0].y
+        self.x = Vragi[self.N].x
+        self.y = Vragi[self.N].y
         self.fi = 0
-        self.fi_povorota = - numpy.pi / 2 + Vragi[0].fi
-        self.r = 30
+        self.fi_povorota = - numpy.pi / 2 + Vragi[self.N].fi
+        self.r = 60
         self.Hitbox = [[0, 0]] * 4
         self.time_of_birthday = pygame.time.get_ticks()
         self.live = True
@@ -255,7 +246,7 @@ def inside_check(x, y, a):
 
 def explosion(x, y, t):
     if t < 0.5 * T_live_sharov:
-        for ik in range(0, 30):
+        for ik in range(0, 10):
             fi = randint(0, 500)
             dobavka_x = randint(-10, 10)
             dobavka_y = randint(-10, 10)
@@ -431,9 +422,9 @@ k_bullets = 7
 Magazin = [Bullets()] * k_bullets
 k_sharov = 6
 Dolgi = [SharOdin()] * k_sharov
-k_antihero = 1
+k_antihero = 3
 Vragi = [AntiHero()] * k_antihero
-k_butilok = 1
+k_butilok = 3
 Butilki = [Snaryad()] * k_butilok
 for i in range(k_bullets):
     Magazin[i] = Bullets()
@@ -497,10 +488,13 @@ while not finished:
 
     if pygame.time.get_ticks() - time_prev_update > 500 / FPS:
         dvigai_objcts()
-        for i in range (k_antihero):
-            if pygame.time.get_ticks() - time_prev_bottle > 4000 * 50 / FPS:
-                time_prev_bottle = pygame.time.get_ticks()
+
+        if pygame.time.get_ticks() - time_prev_bottle > 4000 * 50 / FPS:
+            time_prev_bottle = pygame.time.get_ticks()
+            for i in range(k_antihero):
+                Butilki[i].N=i
                 Butilki[i] = Snaryad()
+
         time_prev_update = pygame.time.get_ticks()
         draw_scren()
 pygame.quit()
